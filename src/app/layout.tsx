@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Treino em Casa",
+  title: "Home Training",
   description: "Fichas de treino geradas pelos equipamentos que você tem em casa.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Treino em Casa",
+    title: "Home Training",
   },
 };
 

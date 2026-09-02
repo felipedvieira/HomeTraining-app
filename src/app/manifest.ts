@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Treino em Casa",
-    short_name: "Treino em Casa",
+    name: "Home Training",
+    short_name: "Home Training",
     description: "Fichas de treino geradas pelos equipamentos que você tem em casa.",
     start_url: "/",
     display: "standalone",

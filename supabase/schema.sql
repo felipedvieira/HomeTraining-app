@@ -37,6 +37,7 @@ on conflict (id) do nothing;
 create table profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
+  avatar_url text,
   created_at timestamptz not null default now()
 );
 
@@ -237,3 +238,22 @@ create index on goals (profile_id) where is_active;
 create index on workout_plan_days (plan_id, order_index);
 create index on workout_plan_exercises (plan_day_id, order_index);
 create index on workout_logs (profile_id);
+
+-- ---------------------------------------------------------------------------
+-- Foto de perfil
+-- ---------------------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+create policy "avatars: owner can insert" on storage.objects for insert
+  with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy "avatars: owner can update" on storage.objects for update
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy "avatars: owner can delete" on storage.objects for delete
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy "avatars: public read" on storage.objects for select
+  using (bucket_id = 'avatars');

@@ -2,9 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { Calendar, type CalendarMark } from "@/components/Calendar";
+import { AvatarUploader } from "@/components/AvatarUploader";
 import { skipWorkoutDay, cancelPlan } from "./actions";
+import { signOut } from "@/lib/auth/actions";
 
 function daysRemainingUntil(startIso: string, durationDays: number): number {
   const start = new Date(startIso);
@@ -29,6 +32,12 @@ export default async function DashboardPage() {
     .maybeSingle();
 
   if (!plan) redirect("/onboarding");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("avatar_url")
+    .eq("id", user.id)
+    .single();
 
   const { data: goal } = await supabase
     .from("goals")
@@ -60,11 +69,21 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex-1 px-4 py-8 max-w-2xl mx-auto w-full space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Seu treino</h1>
-        <p className="text-muted text-sm">
-          Meta de {goal?.weight_loss_target_kg}kg em {goal?.duration_days} dias
-        </p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <AvatarUploader userId={user.id} initialUrl={profile?.avatar_url ?? null} />
+          <div>
+            <h1 className="text-xl font-bold">Home Training</h1>
+            <p className="text-muted text-sm">
+              Meta de {goal?.weight_loss_target_kg}kg em {goal?.duration_days} dias
+            </p>
+          </div>
+        </div>
+        <form action={signOut}>
+          <Button type="submit" variant="ghost">
+            Sair
+          </Button>
+        </form>
       </div>
 
       <div className="grid grid-cols-2 gap-3">

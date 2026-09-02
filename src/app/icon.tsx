@@ -32,7 +32,7 @@ export default async function Icon({ id }: { id: Promise<string | number> }) {
             fontFamily: "sans-serif",
           }}
         >
-          T
+          H
         </div>
       </div>
     ),

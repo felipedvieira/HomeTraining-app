@@ -1,4 +1,4 @@
-# Treino em Casa
+# Home Training
 
 App web (PWA) que gera fichas de treino a partir dos equipamentos que você tem em casa, sua meta
 de perda de peso e o prazo desejado, com progressão automática ao longo das semanas.
