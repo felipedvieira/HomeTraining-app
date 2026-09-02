@@ -1,16 +1,56 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { ensureExerciseDemoMedia, type ExerciseMedia } from "@/lib/exercises/actions";
+
+function AlternatingDemo({ media }: { media: ExerciseMedia }) {
+  const [showSecondary, setShowSecondary] = useState(false);
+
+  useEffect(() => {
+    if (!media.secondaryImageUrl) return;
+    const id = setInterval(() => setShowSecondary((v) => !v), 900);
+    return () => clearInterval(id);
+  }, [media.secondaryImageUrl]);
+
+  if (media.videoUrl) {
+    return <video src={media.videoUrl} controls autoPlay playsInline className="w-full h-full object-cover" />;
+  }
+
+  const src = showSecondary && media.secondaryImageUrl ? media.secondaryImageUrl : media.thumbnailUrl;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src ?? undefined} alt="Demonstração do exercício" className="w-full h-full object-contain" />
+  );
+}
 
 export function ExerciseVideoModal({
+  exerciseId,
   name,
-  videoUrl,
   onClose,
 }: {
+  exerciseId: string;
   name: string;
-  videoUrl: string | null;
   onClose: () => void;
 }) {
+  const [media, setMedia] = useState<ExerciseMedia | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    ensureExerciseDemoMedia(exerciseId).then((result) => {
+      if (!cancelled) {
+        setMedia(result);
+        setLoading(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [exerciseId]);
+
+  const hasMedia = media && (media.videoUrl || media.thumbnailUrl);
+
   return (
     <div
       className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
@@ -21,11 +61,13 @@ export function ExerciseVideoModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="aspect-video bg-black flex items-center justify-center">
-          {videoUrl ? (
-            <video src={videoUrl} controls autoPlay playsInline className="w-full h-full object-cover" />
+          {loading ? (
+            <p className="text-muted text-sm">Carregando demonstração...</p>
+          ) : hasMedia ? (
+            <AlternatingDemo media={media} />
           ) : (
             <p className="text-muted text-sm px-6 text-center">
-              Vídeo de demonstração ainda não cadastrado para este exercício.
+              Ainda não temos demonstração visual para este exercício.
             </p>
           )}
         </div>

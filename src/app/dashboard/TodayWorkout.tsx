@@ -61,7 +61,7 @@ export function TodayWorkout({ day }: { day: TodayWorkoutDay }) {
   async function handleFinish() {
     setFinishing(true);
     await completeWorkoutDay(day.id, elapsed);
-    router.refresh();
+    router.push("/dashboard");
   }
 
   return (
@@ -108,8 +108,8 @@ export function TodayWorkout({ day }: { day: TodayWorkoutDay }) {
 
       {videoExercise && (
         <ExerciseVideoModal
+          exerciseId={videoExercise.id}
           name={videoExercise.name}
-          videoUrl={videoExercise.video_url}
           onClose={() => setVideoExercise(null)}
         />
       )}

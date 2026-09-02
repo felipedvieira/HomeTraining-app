@@ -2,6 +2,7 @@
 // Se preferir, troque por tipos gerados com `supabase gen types typescript` depois de criar o projeto.
 
 export type CardioPreference = "low" | "moderate" | "high";
+export type WorkoutDayStatus = "pending" | "completed" | "skipped";
 
 export interface Database {
   public: {
@@ -66,6 +67,7 @@ export interface Database {
           is_compound: boolean;
           video_url: string | null;
           thumbnail_url: string | null;
+          secondary_image_url: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["exercises"]["Row"]>;
         Update: Partial<Database["public"]["Tables"]["exercises"]["Row"]>;
@@ -79,6 +81,7 @@ export interface Database {
           split_type: string;
           weeks: number;
           days_per_week: number;
+          cancelled_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -100,7 +103,9 @@ export interface Database {
           day_number: number;
           label: string;
           order_index: number;
+          status: WorkoutDayStatus;
           completed_at: string | null;
+          skipped_at: string | null;
         };
         Insert: {
           plan_id: string;
@@ -110,7 +115,7 @@ export interface Database {
           label: string;
           order_index: number;
         };
-        Update: { completed_at?: string | null };
+        Update: { status?: WorkoutDayStatus; completed_at?: string | null; skipped_at?: string | null };
         Relationships: [];
       };
       workout_plan_exercises: {

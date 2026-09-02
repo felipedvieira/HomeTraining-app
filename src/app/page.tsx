@@ -15,6 +15,7 @@ export default async function Home() {
     .from("workout_plans")
     .select("id")
     .eq("profile_id", user.id)
+    .is("cancelled_at", null)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();

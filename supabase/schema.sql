@@ -83,7 +83,8 @@ create policy "goals: owner all" on goals for all
   using (auth.uid() = profile_id) with check (auth.uid() = profile_id);
 
 -- ---------------------------------------------------------------------------
--- Biblioteca de exercícios (dado compartilhado, mapeado do free-exercise-db-with-videos)
+-- Biblioteca de exercícios (dado compartilhado; video_url/thumbnail_url/secondary_image_url
+-- começam vazios e são preenchidos sob demanda — ver src/lib/exercises/demo-media.ts)
 -- ---------------------------------------------------------------------------
 create table exercises (
   id text primary key,
@@ -93,7 +94,8 @@ create table exercises (
   category text not null check (category in ('strength', 'cardio')),
   is_compound boolean not null default true,
   video_url text,
-  thumbnail_url text
+  thumbnail_url text,
+  secondary_image_url text
 );
 
 -- Precisa espelhar src/lib/exercises/seed.ts — o motor de geração referencia esses IDs.
@@ -145,6 +147,9 @@ on conflict (id) do nothing;
 -- Leitura pública (catálogo compartilhado); sem policies de escrita para usuários comuns.
 alter table exercises enable row level security;
 create policy "exercises: public read" on exercises for select using (true);
+create policy "exercises: authenticated can fill media" on exercises for update
+  using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
 alter table equipment_catalog enable row level security;
 create policy "equipment_catalog: public read" on equipment_catalog for select using (true);
 
@@ -158,6 +163,7 @@ create table workout_plans (
   split_type text not null,
   weeks int not null,
   days_per_week int not null,
+  cancelled_at timestamptz,
   created_at timestamptz not null default now()
 );
 
@@ -174,7 +180,9 @@ create table workout_plan_days (
   day_number int not null,
   label text not null,
   order_index int not null,
-  completed_at timestamptz
+  status text not null default 'pending' check (status in ('pending', 'completed', 'skipped')),
+  completed_at timestamptz,
+  skipped_at timestamptz
 );
 
 alter table workout_plan_days enable row level security;
