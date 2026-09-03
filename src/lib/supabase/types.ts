@@ -12,6 +12,7 @@ export interface Database {
           id: string;
           name: string;
           category: "cardio" | "strength_machine" | "free_weight" | "bodyweight" | "accessory";
+          image_url: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["equipment_catalog"]["Row"]>;
         Update: Partial<Database["public"]["Tables"]["equipment_catalog"]["Row"]>;

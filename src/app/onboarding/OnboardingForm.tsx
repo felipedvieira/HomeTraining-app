@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { createPlanFromOnboarding } from "./actions";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { TextField, SelectField } from "@/components/ui/Field";
+import { EquipmentPhotoModal } from "@/components/EquipmentPhotoModal";
 
-type EquipmentRow = { id: string; name: string; category: string };
+type EquipmentRow = { id: string; name: string; category: string; image_url: string | null };
 
 const CATEGORY_LABELS: Record<string, string> = {
   cardio: "Cardio",
@@ -36,6 +38,7 @@ function SubmitButton() {
 
 export function OnboardingForm({ equipmentCatalog }: { equipmentCatalog: EquipmentRow[] }) {
   const groups = groupByCategory(equipmentCatalog.filter((e) => e.id !== "none"));
+  const [photoItem, setPhotoItem] = useState<EquipmentRow | null>(null);
 
   return (
     <form action={createPlanFromOnboarding} className="space-y-6">
@@ -110,13 +113,23 @@ export function OnboardingForm({ equipmentCatalog }: { equipmentCatalog: Equipme
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {items.map((item) => (
-                  <label
+                  <div
                     key={item.id}
-                    className="flex items-center gap-2 bg-surface-2 border border-border rounded-lg px-3 py-2 text-sm cursor-pointer has-[:checked]:border-primary has-[:checked]:text-primary"
+                    className="flex items-center gap-1 bg-surface-2 border border-border rounded-lg pl-3 pr-1.5 py-2 text-sm has-[:checked]:border-primary has-[:checked]:text-primary"
                   >
-                    <input type="checkbox" name="equipment" value={item.id} className="accent-primary" />
-                    {item.name}
-                  </label>
+                    <label className="flex items-center gap-2 flex-1 cursor-pointer min-w-0">
+                      <input type="checkbox" name="equipment" value={item.id} className="accent-primary shrink-0" />
+                      <span className="truncate">{item.name}</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setPhotoItem(item)}
+                      aria-label={`O que é ${item.name}?`}
+                      className="shrink-0 w-5 h-5 rounded-full bg-surface border border-border text-muted text-xs flex items-center justify-center hover:text-primary hover:border-primary"
+                    >
+                      ?
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -125,6 +138,14 @@ export function OnboardingForm({ equipmentCatalog }: { equipmentCatalog: Equipme
       </Card>
 
       <SubmitButton />
+
+      {photoItem && (
+        <EquipmentPhotoModal
+          name={photoItem.name}
+          imageUrl={photoItem.image_url}
+          onClose={() => setPhotoItem(null)}
+        />
+      )}
     </form>
   );
 }
