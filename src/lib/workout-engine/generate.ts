@@ -25,9 +25,9 @@ const SPLIT_TEMPLATES: Record<string, MuscleGroup[][]> = {
 };
 
 const DAY_LABELS: Record<string, string[]> = {
-  full_body: ["Treino A — Corpo Inteiro", "Treino B — Corpo Inteiro", "Treino C — Corpo Inteiro"],
-  upper_lower: ["Superior", "Inferior"],
-  push_pull_legs: ["Push (Empurrar)", "Pull (Puxar)", "Legs (Pernas)"],
+  full_body: ["Ficha de Corpo Inteiro A", "Ficha de Corpo Inteiro B", "Ficha de Corpo Inteiro C"],
+  upper_lower: ["Ficha de Superiores", "Ficha de Inferiores"],
+  push_pull_legs: ["Ficha de Push (Empurrar)", "Ficha de Pull (Puxar)", "Ficha de Pernas"],
 };
 
 const FREE_WEIGHT_EQUIPMENT = new Set(["dumbbells", "barbell", "kettlebell", null]);
@@ -179,7 +179,7 @@ export function generateWorkoutPlan(input: UserPreferences, exercisePool: Exerci
         days.push({
           weekNumber: week,
           dayNumber,
-          label: "Cardio Intenso",
+          label: "Ficha de Cardio Intenso",
           exercises: buildCardioDay(pool, used, lowImpactPreferred),
         });
         continue;

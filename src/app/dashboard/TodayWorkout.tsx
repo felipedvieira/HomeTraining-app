@@ -8,6 +8,7 @@ import { SessionTimer } from "@/components/workout/SessionTimer";
 import { RestTimer } from "@/components/workout/RestTimer";
 import { ExerciseVideoModal } from "@/components/workout/ExerciseVideoModal";
 import { completeWorkoutDay } from "./actions";
+import { emojiForWorkoutLabel } from "@/lib/workout-engine/emoji";
 
 const MUSCLE_LABELS: Record<string, string> = {
   chest: "Peito",
@@ -70,7 +71,9 @@ export function TodayWorkout({ day }: { day: TodayWorkoutDay }) {
         <p className="text-xs text-muted uppercase tracking-wide">
           Semana {day.week_number} · Dia {day.day_number}
         </p>
-        <h2 className="text-xl font-bold text-primary">{day.label}</h2>
+        <h2 className="text-xl font-bold text-primary">
+          {emojiForWorkoutLabel(day.label)} {day.label}
+        </h2>
       </div>
 
       <SessionTimer onElapsedChange={setElapsed} />

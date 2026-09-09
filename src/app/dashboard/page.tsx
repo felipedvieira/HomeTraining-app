@@ -8,6 +8,7 @@ import { Calendar, type CalendarMark } from "@/components/Calendar";
 import { AvatarUploader } from "@/components/AvatarUploader";
 import { skipWorkoutDay, cancelPlan } from "./actions";
 import { signOut } from "@/lib/auth/actions";
+import { emojiForWorkoutLabel } from "@/lib/workout-engine/emoji";
 
 function daysRemainingUntil(startIso: string, durationDays: number): number {
   const start = new Date(startIso);
@@ -65,6 +66,7 @@ export default async function DashboardPage() {
     .map((d) => ({
       date: (d.status === "completed" ? d.completed_at : d.skipped_at) as string,
       status: d.status as "completed" | "skipped",
+      emoji: emojiForWorkoutLabel(d.label),
     }));
 
   return (
@@ -103,7 +105,7 @@ export default async function DashboardPage() {
             href="/dashboard/treino"
             className="flex-1 text-center px-4 py-2.5 rounded-xl font-semibold text-sm bg-primary text-primary-foreground hover:brightness-110 transition"
           >
-            Iniciar treino ({nextDay.label})
+            {emojiForWorkoutLabel(nextDay.label)} Iniciar treino ({nextDay.label})
           </Link>
           <form action={skipWorkoutDay.bind(null, nextDay.id)}>
             <ConfirmButton type="submit" variant="secondary" confirmText="Pular o treino de hoje?">

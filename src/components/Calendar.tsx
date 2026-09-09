@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 export interface CalendarMark {
   date: string; // ISO timestamp
   status: "completed" | "skipped";
+  emoji: string;
 }
 
 const WEEKDAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
@@ -22,12 +23,12 @@ export function Calendar({ marks }: { marks: CalendarMark[] }) {
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
   const markByDay = useMemo(() => {
-    const map = new Map<string, "completed" | "skipped">();
+    const map = new Map<string, CalendarMark>();
     for (const mark of marks) {
       const d = new Date(mark.date);
       const key = dateKey(d);
       // completed tem prioridade visual se por algum motivo houver dois registros no mesmo dia
-      if (mark.status === "completed" || !map.has(key)) map.set(key, mark.status);
+      if (mark.status === "completed" || !map.has(key)) map.set(key, mark);
     }
     return map;
   }, [marks]);
@@ -75,20 +76,25 @@ export function Calendar({ marks }: { marks: CalendarMark[] }) {
         {cells.map((day, i) => {
           if (day === null) return <div key={i} />;
           const key = `${year}-${month}-${day}`;
-          const status = markByDay.get(key);
+          const mark = markByDay.get(key);
           const isToday = dateKey(today) === key;
           return (
             <div
               key={i}
-              className={`aspect-square flex items-center justify-center rounded-lg text-xs ${
-                status === "completed"
+              className={`relative aspect-square flex items-center justify-center rounded-lg text-xs ${
+                mark?.status === "completed"
                   ? "bg-primary text-primary-foreground font-semibold"
-                  : status === "skipped"
+                  : mark?.status === "skipped"
                     ? "bg-danger/25 text-danger"
                     : "bg-surface-2 text-muted"
               } ${isToday ? "ring-1 ring-primary" : ""}`}
             >
               {day}
+              {mark && (
+                <span className="absolute -top-1.5 -right-1.5 text-[11px] leading-none">
+                  {mark.emoji}
+                </span>
+              )}
             </div>
           );
         })}
