@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/Button";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { Calendar, type CalendarMark } from "@/components/Calendar";
 import { AvatarUploader } from "@/components/AvatarUploader";
-import { skipWorkoutDay, cancelPlan } from "./actions";
+import { skipWorkoutDay, logCardioOnly, cancelPlan } from "./actions";
 import { signOut } from "@/lib/auth/actions";
-import { emojiForWorkoutLabel } from "@/lib/workout-engine/emoji";
+import { emojiForWorkoutLabel, CARDIO_ONLY_EMOJI } from "@/lib/workout-engine/emoji";
 
 function daysRemainingUntil(startIso: string, durationDays: number): number {
   const start = new Date(startIso);
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
 
   const { data: dayRows } = await supabase
     .from("workout_plan_days")
-    .select("id, order_index, label, status, completed_at, skipped_at")
+    .select("id, order_index, label, status, completed_at, skipped_at, cardio_only_at")
     .eq("plan_id", plan.id)
     .order("order_index", { ascending: true });
 
@@ -56,18 +56,25 @@ export default async function DashboardPage() {
   const totalDays = plan.weeks * plan.days_per_week;
   const completedCount = days.filter((d) => d.status === "completed").length;
   const skippedCount = days.filter((d) => d.status === "skipped").length;
-  const pendingCount = totalDays - completedCount - skippedCount;
+  const cardioOnlyCount = days.filter((d) => d.status === "cardio_only").length;
+  const pendingCount = totalDays - completedCount - skippedCount - cardioOnlyCount;
   const nextDay = days.find((d) => d.status === "pending") ?? null;
 
   const daysRemaining = daysRemainingUntil(plan.created_at, goal?.duration_days ?? 0);
 
   const marks: CalendarMark[] = days
-    .filter((d) => d.status !== "pending" && (d.completed_at || d.skipped_at))
-    .map((d) => ({
-      date: (d.status === "completed" ? d.completed_at : d.skipped_at) as string,
-      status: d.status as "completed" | "skipped",
-      emoji: emojiForWorkoutLabel(d.label),
-    }));
+    .filter((d) => d.status !== "pending")
+    .map((d) => {
+      const date = d.completed_at ?? d.skipped_at ?? d.cardio_only_at;
+      const status = d.status as "completed" | "skipped" | "cardio_only";
+      return {
+        date: date as string,
+        status,
+        emoji: status === "cardio_only" ? CARDIO_ONLY_EMOJI : emojiForWorkoutLabel(d.label),
+        label: d.label,
+      };
+    })
+    .filter((m) => m.date);
 
   return (
     <div className="flex-1 px-4 py-8 max-w-2xl mx-auto w-full space-y-6">
@@ -100,18 +107,35 @@ export default async function DashboardPage() {
       </div>
 
       {nextDay ? (
-        <div className="flex gap-3">
+        <div className="space-y-2">
           <Link
             href="/dashboard/treino"
-            className="flex-1 text-center px-4 py-2.5 rounded-xl font-semibold text-sm bg-primary text-primary-foreground hover:brightness-110 transition"
+            className="block text-center px-4 py-2.5 rounded-xl font-semibold text-sm bg-primary text-primary-foreground hover:brightness-110 transition"
           >
             {emojiForWorkoutLabel(nextDay.label)} Iniciar treino ({nextDay.label})
           </Link>
-          <form action={skipWorkoutDay.bind(null, nextDay.id)}>
-            <ConfirmButton type="submit" variant="secondary" confirmText="Pular o treino de hoje?">
-              Pular hoje
-            </ConfirmButton>
-          </form>
+          <div className="flex gap-2">
+            <form action={logCardioOnly.bind(null, nextDay.id)} className="flex-1">
+              <ConfirmButton
+                type="submit"
+                variant="secondary"
+                className="w-full"
+                confirmText="Registrar que você fez só cardio hoje, no lugar dessa ficha?"
+              >
+                {CARDIO_ONLY_EMOJI} Só cardio hoje
+              </ConfirmButton>
+            </form>
+            <form action={skipWorkoutDay.bind(null, nextDay.id)} className="flex-1">
+              <ConfirmButton
+                type="submit"
+                variant="secondary"
+                className="w-full"
+                confirmText="Pular o treino de hoje?"
+              >
+                Pular hoje
+              </ConfirmButton>
+            </form>
+          </div>
         </div>
       ) : (
         <Card className="text-center py-6">

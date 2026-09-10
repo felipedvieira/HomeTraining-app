@@ -42,6 +42,22 @@ export async function skipWorkoutDay(planDayId: string) {
   revalidatePath("/dashboard");
 }
 
+export async function logCardioOnly(planDayId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Não autenticado");
+
+  await supabase
+    .from("workout_plan_days")
+    .update({ status: "cardio_only", cardio_only_at: new Date().toISOString() })
+    .eq("id", planDayId)
+    .eq("profile_id", user.id);
+
+  revalidatePath("/dashboard");
+}
+
 export async function cancelPlan(planId: string) {
   const supabase = await createClient();
   const {

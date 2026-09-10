@@ -16,3 +16,6 @@ export function emojiForWorkoutLabel(label: string): string {
 
   return "🏋️";
 }
+
+/** Emoji fixo pra quando a pessoa pula a ficha do dia e faz só cardio no lugar. */
+export const CARDIO_ONLY_EMOJI = "🚶";

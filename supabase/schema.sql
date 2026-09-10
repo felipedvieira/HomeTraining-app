@@ -216,9 +216,10 @@ create table workout_plan_days (
   day_number int not null,
   label text not null,
   order_index int not null,
-  status text not null default 'pending' check (status in ('pending', 'completed', 'skipped')),
+  status text not null default 'pending' check (status in ('pending', 'completed', 'skipped', 'cardio_only')),
   completed_at timestamptz,
-  skipped_at timestamptz
+  skipped_at timestamptz,
+  cardio_only_at timestamptz
 );
 
 alter table workout_plan_days enable row level security;

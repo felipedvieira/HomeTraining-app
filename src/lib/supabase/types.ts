@@ -2,7 +2,7 @@
 // Se preferir, troque por tipos gerados com `supabase gen types typescript` depois de criar o projeto.
 
 export type CardioPreference = "low" | "moderate" | "high";
-export type WorkoutDayStatus = "pending" | "completed" | "skipped";
+export type WorkoutDayStatus = "pending" | "completed" | "skipped" | "cardio_only";
 
 export interface Database {
   public: {
@@ -107,6 +107,7 @@ export interface Database {
           status: WorkoutDayStatus;
           completed_at: string | null;
           skipped_at: string | null;
+          cardio_only_at: string | null;
         };
         Insert: {
           plan_id: string;
@@ -116,7 +117,12 @@ export interface Database {
           label: string;
           order_index: number;
         };
-        Update: { status?: WorkoutDayStatus; completed_at?: string | null; skipped_at?: string | null };
+        Update: {
+          status?: WorkoutDayStatus;
+          completed_at?: string | null;
+          skipped_at?: string | null;
+          cardio_only_at?: string | null;
+        };
         Relationships: [];
       };
       workout_plan_exercises: {
