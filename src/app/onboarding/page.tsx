@@ -11,7 +11,7 @@ export default async function OnboardingPage() {
 
   const { data: equipmentCatalog } = await supabase
     .from("equipment_catalog")
-    .select("id, name, category, image_url");
+    .select("id, name, category, image_url, muscle_group");
 
   return (
     <div className="flex-1 px-4 py-10 max-w-2xl mx-auto w-full">

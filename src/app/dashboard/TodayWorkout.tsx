@@ -56,8 +56,18 @@ export function TodayWorkout({ day }: { day: TodayWorkoutDay }) {
   const [rest, setRest] = useState<{ seconds: number; token: number } | null>(null);
   const [videoExercise, setVideoExercise] = useState<ExerciseInfo | null>(null);
   const [finishing, setFinishing] = useState(false);
+  const [doneIds, setDoneIds] = useState<Set<string>>(new Set());
 
   const exercises = [...day.workout_plan_exercises].sort((a, b) => a.order_index - b.order_index);
+
+  function toggleDone(id: string) {
+    setDoneIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   async function handleFinish() {
     setFinishing(true);
@@ -78,29 +88,53 @@ export function TodayWorkout({ day }: { day: TodayWorkoutDay }) {
 
       <SessionTimer onElapsedChange={setElapsed} />
 
+      <p className="text-sm text-muted">
+        {doneIds.size} de {exercises.length} exercícios concluídos
+      </p>
+
       <div className="space-y-3">
-        {exercises.map((pe) => (
-          <Card key={pe.id} className="flex items-center gap-3">
-            <div className="flex-1">
-              <p className="font-semibold">{pe.exercises.name}</p>
-              <p className="text-sm text-muted">
-                {MUSCLE_LABELS[pe.exercises.primary_muscle] ?? pe.exercises.primary_muscle} ·{" "}
-                {pe.sets}x {pe.reps}
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Button variant="ghost" onClick={() => setVideoExercise(pe.exercises)}>
-                Ver vídeo
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => setRest({ seconds: pe.rest_seconds, token: Date.now() })}
+        {exercises.map((pe) => {
+          const done = doneIds.has(pe.id);
+          return (
+            <Card
+              key={pe.id}
+              className={`flex items-center gap-3 transition ${
+                done ? "border-primary/60 bg-primary/5" : ""
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => toggleDone(pe.id)}
+                aria-label={done ? "Marcar como não concluído" : "Marcar como concluído"}
+                className={`shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold transition ${
+                  done
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "border-border text-transparent hover:border-primary"
+                }`}
               >
-                Descansar {pe.rest_seconds}s
-              </Button>
-            </div>
-          </Card>
-        ))}
+                ✓
+              </button>
+              <div className={`flex-1 min-w-0 ${done ? "opacity-60" : ""}`}>
+                <p className={`font-semibold ${done ? "line-through" : ""}`}>{pe.exercises.name}</p>
+                <p className="text-sm text-muted">
+                  {MUSCLE_LABELS[pe.exercises.primary_muscle] ?? pe.exercises.primary_muscle} ·{" "}
+                  {pe.sets}x {pe.reps}
+                </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Button variant="ghost" onClick={() => setVideoExercise(pe.exercises)}>
+                  Ver vídeo
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setRest({ seconds: pe.rest_seconds, token: Date.now() })}
+                >
+                  Descansar {pe.rest_seconds}s
+                </Button>
+              </div>
+            </Card>
+          );
+        })}
       </div>
 
       <Button className="w-full" onClick={handleFinish} disabled={finishing}>

@@ -8,23 +8,37 @@ import { Button } from "@/components/ui/Button";
 import { TextField, SelectField } from "@/components/ui/Field";
 import { EquipmentPhotoModal } from "@/components/EquipmentPhotoModal";
 
-type EquipmentRow = { id: string; name: string; category: string; image_url: string | null };
-
-const CATEGORY_LABELS: Record<string, string> = {
-  cardio: "Cardio",
-  free_weight: "Pesos livres",
-  strength_machine: "Máquinas / estruturas",
-  accessory: "Acessórios",
-  bodyweight: "Peso do corpo",
+type EquipmentRow = {
+  id: string;
+  name: string;
+  category: string;
+  image_url: string | null;
+  muscle_group: string | null;
 };
 
-function groupByCategory(items: EquipmentRow[]) {
+const MUSCLE_GROUP_ORDER = ["full_body", "cardio", "legs", "back", "chest", "shoulders", "arms", "core"];
+
+const MUSCLE_GROUP_LABELS: Record<string, string> = {
+  full_body: "Full Body",
+  cardio: "Cardio",
+  legs: "Pernas",
+  back: "Costas",
+  chest: "Peito",
+  shoulders: "Ombros",
+  arms: "Braços",
+  core: "Abdômen",
+};
+
+function groupByMuscle(items: EquipmentRow[]) {
   const groups = new Map<string, EquipmentRow[]>();
   for (const item of items) {
-    if (!groups.has(item.category)) groups.set(item.category, []);
-    groups.get(item.category)!.push(item);
+    const key = item.muscle_group ?? "full_body";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(item);
   }
-  return groups;
+  return [...groups.entries()].sort(
+    (a, b) => MUSCLE_GROUP_ORDER.indexOf(a[0]) - MUSCLE_GROUP_ORDER.indexOf(b[0])
+  );
 }
 
 function SubmitButton() {
@@ -37,7 +51,7 @@ function SubmitButton() {
 }
 
 export function OnboardingForm({ equipmentCatalog }: { equipmentCatalog: EquipmentRow[] }) {
-  const groups = groupByCategory(equipmentCatalog.filter((e) => e.id !== "none"));
+  const groups = groupByMuscle(equipmentCatalog.filter((e) => e.id !== "none"));
   const [photoItem, setPhotoItem] = useState<EquipmentRow | null>(null);
 
   return (
@@ -105,12 +119,13 @@ export function OnboardingForm({ equipmentCatalog }: { equipmentCatalog: Equipme
 
       <Card>
         <h2 className="font-semibold mb-3">Quais equipamentos você tem?</h2>
-        <div className="space-y-4">
-          {[...groups.entries()].map(([category, items]) => (
-            <div key={category}>
-              <p className="text-xs uppercase tracking-wide text-muted mb-2">
-                {CATEGORY_LABELS[category] ?? category}
-              </p>
+        <p className="text-xs text-muted mb-4">Agrupado por grupo muscular, pra facilitar na hora de marcar.</p>
+        <div className="space-y-5">
+          {groups.map(([muscleGroup, items]) => (
+            <fieldset key={muscleGroup} className="border border-border rounded-xl p-3">
+              <legend className="text-xs uppercase tracking-wide text-primary font-semibold px-1">
+                {MUSCLE_GROUP_LABELS[muscleGroup] ?? muscleGroup}
+              </legend>
               <div className="grid grid-cols-2 gap-2">
                 {items.map((item) => (
                   <div
@@ -132,7 +147,7 @@ export function OnboardingForm({ equipmentCatalog }: { equipmentCatalog: Equipme
                   </div>
                 ))}
               </div>
-            </div>
+            </fieldset>
           ))}
         </div>
       </Card>

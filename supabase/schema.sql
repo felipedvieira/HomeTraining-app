@@ -12,45 +12,51 @@ create table equipment_catalog (
   id text primary key,
   name text not null,
   category text not null check (category in ('cardio', 'strength_machine', 'free_weight', 'bodyweight', 'accessory')),
-  image_url text
+  image_url text,
+  -- Agrupamento por grupo muscular, usado só pra organizar o checklist do onboarding.
+  muscle_group text
 );
 
 -- image_url aponta pros ícones ilustrados em public/equipment/*.svg (mesmo estilo visual
 -- pra todos — ver src/components/EquipmentPhotoModal.tsx e o botão de dúvida no onboarding).
-insert into equipment_catalog (id, name, category, image_url) values
-  ('treadmill', 'Esteira', 'cardio', '/equipment/treadmill.svg'),
-  ('bike', 'Bicicleta ergométrica', 'cardio', '/equipment/bike.svg'),
-  ('rowing_machine', 'Remo (rowing machine)', 'cardio', '/equipment/rowing_machine.svg'),
-  ('jump_rope', 'Corda de pular', 'cardio', '/equipment/jump_rope.svg'),
-  ('dumbbells', 'Halteres', 'free_weight', '/equipment/dumbbells.svg'),
-  ('barbell', 'Barra e anilhas', 'free_weight', '/equipment/barbell.svg'),
-  ('kettlebell', 'Kettlebell', 'free_weight', '/equipment/kettlebell.svg'),
-  ('bench', 'Banco (reto/ajustável)', 'accessory', '/equipment/bench.svg'),
-  ('power_rack', 'Gaiola / power rack', 'strength_machine', '/equipment/power_rack.svg'),
-  ('pull_up_bar', 'Barra fixa', 'strength_machine', '/equipment/pull_up_bar.svg'),
-  ('resistance_band', 'Elástico de resistência', 'accessory', '/equipment/resistance_band.svg'),
-  ('trx', 'TRX / fita de suspensão', 'accessory', '/equipment/trx.svg'),
-  ('mat', 'Colchonete', 'accessory', '/equipment/mat.svg'),
-  ('leg_press', 'Leg press', 'strength_machine', '/equipment/leg_press.svg'),
-  ('leg_extension', 'Cadeira extensora', 'strength_machine', '/equipment/leg_extension.svg'),
-  ('leg_curl', 'Mesa flexora', 'strength_machine', '/equipment/leg_curl.svg'),
-  ('hack_squat', 'Hack squat', 'strength_machine', '/equipment/hack_squat.svg'),
-  ('hip_adductor', 'Cadeira adutora', 'strength_machine', '/equipment/hip_adductor.svg'),
-  ('hip_abductor', 'Cadeira abdutora', 'strength_machine', '/equipment/hip_abductor.svg'),
-  ('smith_machine', 'Smith (agachamento guiado)', 'strength_machine', '/equipment/smith_machine.svg'),
-  ('calf_raise_machine', 'Máquina de panturrilha', 'strength_machine', '/equipment/calf_raise_machine.svg'),
-  ('lat_pulldown', 'Puxador (lat pulldown)', 'strength_machine', '/equipment/lat_pulldown.svg'),
-  ('seated_row', 'Remada baixa (cabo)', 'strength_machine', '/equipment/seated_row.svg'),
-  ('chest_fly_machine', 'Peck deck (voador)', 'strength_machine', '/equipment/chest_fly_machine.svg'),
-  ('cable_crossover', 'Cross over (polia dupla)', 'strength_machine', '/equipment/cable_crossover.svg'),
-  ('cable_tricep', 'Polia de tríceps', 'strength_machine', '/equipment/cable_tricep.svg'),
-  ('preacher_bench', 'Banco Scott (rosca)', 'strength_machine', '/equipment/preacher_bench.svg'),
-  ('shoulder_press_machine', 'Máquina de desenvolvimento', 'strength_machine', '/equipment/shoulder_press_machine.svg'),
-  ('chest_press_machine', 'Máquina de supino', 'strength_machine', '/equipment/chest_press_machine.svg'),
-  ('assisted_pullup_dip', 'Barra/paralela assistida', 'strength_machine', '/equipment/assisted_pullup_dip.svg'),
-  ('ab_crunch_machine', 'Máquina de abdômen', 'strength_machine', '/equipment/ab_crunch_machine.svg'),
-  ('none', 'Nenhum (peso do corpo)', 'bodyweight', null)
-on conflict (id) do nothing;
+insert into equipment_catalog (id, name, category, image_url, muscle_group) values
+  ('treadmill', 'Esteira', 'cardio', '/equipment/treadmill.svg', 'cardio'),
+  ('bike', 'Bicicleta ergométrica', 'cardio', '/equipment/bike.svg', 'cardio'),
+  ('rowing_machine', 'Remo (rowing machine)', 'cardio', '/equipment/rowing_machine.svg', 'cardio'),
+  ('jump_rope', 'Corda de pular', 'cardio', '/equipment/jump_rope.svg', 'cardio'),
+  ('dumbbells', 'Halteres', 'free_weight', '/equipment/dumbbells.svg', 'full_body'),
+  ('barbell', 'Barra e anilhas', 'free_weight', '/equipment/barbell.svg', 'full_body'),
+  ('kettlebell', 'Kettlebell', 'free_weight', '/equipment/kettlebell.svg', 'full_body'),
+  ('bench', 'Banco (reto/ajustável)', 'accessory', '/equipment/bench.svg', 'full_body'),
+  ('power_rack', 'Gaiola / power rack', 'strength_machine', '/equipment/power_rack.svg', 'full_body'),
+  ('pull_up_bar', 'Barra fixa', 'strength_machine', '/equipment/pull_up_bar.svg', 'back'),
+  ('resistance_band', 'Elástico de resistência', 'accessory', '/equipment/resistance_band.svg', 'full_body'),
+  ('trx', 'TRX / fita de suspensão', 'accessory', '/equipment/trx.svg', 'full_body'),
+  ('mat', 'Colchonete', 'accessory', '/equipment/mat.svg', 'full_body'),
+  ('leg_press', 'Leg press', 'strength_machine', '/equipment/leg_press.svg', 'legs'),
+  ('leg_extension', 'Cadeira extensora', 'strength_machine', '/equipment/leg_extension.svg', 'legs'),
+  ('leg_curl', 'Mesa flexora', 'strength_machine', '/equipment/leg_curl.svg', 'legs'),
+  ('hack_squat', 'Hack squat', 'strength_machine', '/equipment/hack_squat.svg', 'legs'),
+  ('hip_adductor', 'Cadeira adutora', 'strength_machine', '/equipment/hip_adductor.svg', 'legs'),
+  ('hip_abductor', 'Cadeira abdutora', 'strength_machine', '/equipment/hip_abductor.svg', 'legs'),
+  ('smith_machine', 'Smith (agachamento guiado)', 'strength_machine', '/equipment/smith_machine.svg', 'legs'),
+  ('calf_raise_machine', 'Máquina de panturrilha', 'strength_machine', '/equipment/calf_raise_machine.svg', 'legs'),
+  ('lat_pulldown', 'Puxador (lat pulldown)', 'strength_machine', '/equipment/lat_pulldown.svg', 'back'),
+  ('seated_row', 'Remada baixa (cabo)', 'strength_machine', '/equipment/seated_row.svg', 'back'),
+  ('chest_fly_machine', 'Peck deck (voador)', 'strength_machine', '/equipment/chest_fly_machine.svg', 'chest'),
+  ('cable_crossover', 'Cross over (polia dupla)', 'strength_machine', '/equipment/cable_crossover.svg', 'chest'),
+  ('cable_tricep', 'Polia de tríceps', 'strength_machine', '/equipment/cable_tricep.svg', 'arms'),
+  ('preacher_bench', 'Banco Scott (rosca)', 'strength_machine', '/equipment/preacher_bench.svg', 'arms'),
+  ('shoulder_press_machine', 'Máquina de desenvolvimento', 'strength_machine', '/equipment/shoulder_press_machine.svg', 'shoulders'),
+  ('chest_press_machine', 'Máquina de supino', 'strength_machine', '/equipment/chest_press_machine.svg', 'chest'),
+  ('assisted_pullup_dip', 'Barra/paralela assistida', 'strength_machine', '/equipment/assisted_pullup_dip.svg', 'back'),
+  ('ab_crunch_machine', 'Máquina de abdômen', 'strength_machine', '/equipment/ab_crunch_machine.svg', 'core'),
+  ('none', 'Nenhum (peso do corpo)', 'bodyweight', null, null)
+on conflict (id) do update set
+  name = excluded.name,
+  category = excluded.category,
+  image_url = excluded.image_url,
+  muscle_group = excluded.muscle_group;
 
 -- ---------------------------------------------------------------------------
 -- Perfil (1:1 com auth.users)
